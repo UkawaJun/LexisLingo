@@ -26,7 +26,7 @@ This section displays the frequency distribution across different word lengths. 
 
 
 <p align="center">
-  <img src="[ ](https://github.com/user-attachments/assets/29d0a212-da02-4864-a920-5f2adbea253a)" alt="Word Length Frequency Distribution" width="85%">
+  <img src="https://github.com/user-attachments/assets/29d0a212-da02-4864-a920-5f2adbea253a" alt="Word Length Frequency Distribution" width="85%">
   <br>
   <em>Fig 2: 单词长度与出现频率的映射关系 / Mapping of Word Length to Frequency</em>
 </p>
