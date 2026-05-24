@@ -1,4 +1,4 @@
-# 創発システム知能専攻 - '''Research 01: Contextual Lexicon Project'''
+# 創発システム知能専攻 - 'Research 01: Contextual Lexicon Project'
 
 
 ## Data Report | 数据分析报告
