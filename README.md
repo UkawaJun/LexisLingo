@@ -1,7 +1,6 @@
-# 創発システム知能専攻 - 'Research 01: Contextual Lexicon Project'
+# 創発システム知能専攻-Research 01: Contextual Lexicon Project
 
 
-## Data Report | 数据分析报告
 
 本报告旨在展示初步量化分析结果，重点聚焦于词汇原型（Lemmas）的提取与形态学基础特征分布。
 This report presents the preliminary quantitative analysis, focusing on the extraction of word lemmas and the distribution of fundamental morphological characteristics.
