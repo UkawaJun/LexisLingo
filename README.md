@@ -1,3 +1,4 @@
+
 # 創発システム知能専攻-Research 01: Contextual Lexicon Project
 
 
@@ -14,7 +15,7 @@ This report presents the preliminary quantitative analysis, focusing on the extr
 The following chart illustrates the top 30 most frequently occurring word lemmas in the corpus after morphological tracing. Serving as the foundation for dynamic context generation, these core vocabulary items act as the anchor points of the initial semantic network.
 
 <p align="center">
-  <img src="在此处替换为图1的链接或路径" alt="Top 30 Most Frequent Lemmas" width="85%">
+  <img src="https://github.com/user-attachments/assets/c210ec6d-53e2-4487-85b4-f233d1875ef4" alt="Top 30 Most Frequent Lemmas" width="85%">
   <br>
   <em>Fig 1: 频次最高的前30个单词原型分布 / Top 30 Word Lemmas Distribution</em>
 </p>
