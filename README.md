@@ -3,6 +3,7 @@
 ## Initial Data Report | 初始数据分析报告
 
 本报告旨在展示 LexisLingo 语料库的初步量化分析结果，重点聚焦于词汇原型（Lemmas）的提取与形态学基础特征分布。
+
 This report presents the preliminary quantitative analysis of the LexisLingo corpus, focusing on the extraction of word lemmas and the distribution of fundamental morphological characteristics.
 
 ---
@@ -10,6 +11,7 @@ This report presents the preliminary quantitative analysis of the LexisLingo cor
 ### 1. 高频核心词汇原型提取 (Top 30 Most Frequent Lemmas)
 
 以下图表直观呈现了语料库中经过形态学回溯后，出现频次最高的前 30 个单词原型。作为动态语境生成的基础，这些核心词汇构成了初始语义网络的锚点。
+
 The following chart illustrates the top 30 most frequently occurring word lemmas in the corpus after morphological tracing. Serving as the foundation for dynamic context generation, these core vocabulary items act as the anchor points of the initial semantic network.
 
 <p align="center">
@@ -23,6 +25,7 @@ The following chart illustrates the top 30 most frequently occurring word lemmas
 ### 2. 词汇复杂度与长度分布 (Word Length Frequency Distribution)
 
 本节展示了不同长度单词的频次分布模型。该分布特征客观反映了语料库的词汇复杂度，并为后续测算和干预二语习得中的认知负荷（Cognitive Load）提供了量化依据。
+
 This section displays the frequency distribution across different word lengths. This characteristic objectively reflects the lexical complexity of the corpus and provides a quantitative basis for calculating and intervening in the cognitive load within L2 acquisition models.
 
 <p align="center">
