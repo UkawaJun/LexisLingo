@@ -1,4 +1,4 @@
-# 創発システム知能専攻 - Research 01: Contextual Lexicon Project
+<img width="3600" height="1800" alt="Chart_2_Word_Length_Distribution" src="https://github.com/user-attachments/assets/67609409-5ce8-4a46-bf1e-4cadbafeeee2" /># 創発システム知能専攻 - Research 01: Contextual Lexicon Project
 ## Data Report | 数据分析报告
 
 本报告旨在展示初步量化分析结果，重点聚焦于词汇原型（Lemmas）的提取与形态学基础特征分布。
@@ -24,8 +24,9 @@ The following chart illustrates the top 30 most frequently occurring word lemmas
 本节展示了不同长度单词的频次分布模型。该分布特征客观反映了语料库的词汇复杂度。
 This section displays the frequency distribution across different word lengths. This characteristic objectively reflects the lexical complexity of the corpus.
 
+
 <p align="center">
-  <img src="在此处替换为图2的链接或路径" alt="Word Length Frequency Distribution" width="85%">
+  <img src="[ ](https://github.com/user-attachments/assets/29d0a212-da02-4864-a920-5f2adbea253a)" alt="Word Length Frequency Distribution" width="85%">
   <br>
   <em>Fig 2: 单词长度与出现频率的映射关系 / Mapping of Word Length to Frequency</em>
 </p>
