@@ -1,8 +1,5 @@
 # LexisLingo
-創発システム知能専攻 - Research 01 - Contextual Lexicon Project: An LLM-driven evolutionary network
 
-
-# 創発システム知能専攻 - Research 01: Contextual Lexicon Project
 ## Initial Data Report | 初始数据分析报告
 
 本报告旨在展示 LexisLingo 语料库的初步量化分析结果，重点聚焦于词汇原型（Lemmas）的提取与形态学基础特征分布。
