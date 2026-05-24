@@ -1,8 +1,8 @@
 # 創発システム知能専攻 - Research 01: Contextual Lexicon Project
-## Initial Data Report | 初始数据分析报告
+## Data Report | 数据分析报告
 
-本报告旨在展示 LexisLingo 语料库的初步量化分析结果，重点聚焦于词汇原型（Lemmas）的提取与形态学基础特征分布。
-This report presents the preliminary quantitative analysis of the LexisLingo corpus, focusing on the extraction of word lemmas and the distribution of fundamental morphological characteristics.
+本报告旨在展示初步量化分析结果，重点聚焦于词汇原型（Lemmas）的提取与形态学基础特征分布。
+This report presents the preliminary quantitative analysis, focusing on the extraction of word lemmas and the distribution of fundamental morphological characteristics.
 
 ---
 
@@ -21,8 +21,8 @@ The following chart illustrates the top 30 most frequently occurring word lemmas
 
 ### 2. 词汇复杂度与长度分布 (Word Length Frequency Distribution)
 
-本节展示了不同长度单词的频次分布模型。该分布特征客观反映了语料库的词汇复杂度，并为后续测算和干预二语习得中的认知负荷（Cognitive Load）提供了量化依据。
-This section displays the frequency distribution across different word lengths. This characteristic objectively reflects the lexical complexity of the corpus and provides a quantitative basis for calculating and intervening in the cognitive load within L2 acquisition models.
+本节展示了不同长度单词的频次分布模型。该分布特征客观反映了语料库的词汇复杂度。
+This section displays the frequency distribution across different word lengths. This characteristic objectively reflects the lexical complexity of the corpus.
 
 <p align="center">
   <img src="在此处替换为图2的链接或路径" alt="Word Length Frequency Distribution" width="85%">
