@@ -1,4 +1,4 @@
-<img width="3600" height="1800" alt="Chart_2_Word_Length_Distribution" src="https://github.com/user-attachments/assets/67609409-5ce8-4a46-bf1e-4cadbafeeee2" /># 創発システム知能専攻 - Research 01: Contextual Lexicon Project
+# 創発システム知能専攻 - Research 01: Contextual Lexicon Project
 ## Data Report | 数据分析报告
 
 本报告旨在展示初步量化分析结果，重点聚焦于词汇原型（Lemmas）的提取与形态学基础特征分布。
