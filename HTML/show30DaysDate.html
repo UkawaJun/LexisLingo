@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30天曲线</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Microsoft YaHei', 'Consolas', sans-serif;
+    background: #ffffff;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* 包豪斯风格顶部色块 */
+  .header {
+    display: flex;
+    align-items: stretch;
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  .header-block {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+  }
+
+  .hb-red   { background: #e63946; flex: 3; }
+  .hb-black { background: #1a1a2e; flex: 1; }
+  .hb-yellow{ background: #f4a261; flex: 1; }
+  .hb-teal  { background: #2a9d8f; flex: 2; }
+
+  .header-title {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* 按钮区 */
+  .btn-area {
+    padding: 12px 20px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex-shrink: 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .btn {
+    padding: 4px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 2px;
+    background: #fff;
+    font-size: 11px;
+    font-family: 'Microsoft YaHei', sans-serif;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.12s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn:hover { border-color: #999; color: #333; }
+
+  .btn.active { color: #fff; border-color: transparent; }
+  .btn[data-key="t"].active    { background: #e63946; }
+  .btn[data-key="n"].active    { background: #1a1a2e; }
+  .btn[data-key="ex"].active   { background: #6c63ff; }
+  .btn[data-key="x"].active    { background: #2a9d8f; }
+  .btn[data-key="re"].active   { background: #f4a261; }
+  .btn[data-key="er"].active   { background: #e76f51; }
+  .btn[data-key="new"].active  { background: #457b9d; }
+  .btn.all.active              { background: #333; }
+
+  /* 图表区 */
+  .chart-wrap {
+    flex: 1;
+    padding: 16px 20px 12px;
+    min-height: 0;
+  }
+
+  canvas { width: 100% !important; height: 100% !important; }
+
+  /* 底部装饰条 */
+  .footer {
+    height: 6px;
+    display: flex;
+    flex-shrink: 0;
+  }
+  .fb1 { background:#e63946; flex:2; }
+  .fb2 { background:#f4a261; flex:1; }
+  .fb3 { background:#2a9d8f; flex:3; }
+  .fb4 { background:#1a1a2e; flex:1; }
+</style>
+</head>
+<body>
+
+<!-- 包豪斯顶部色块 -->
+<div class="header">
+  <div class="header-block hb-red">
+    <span class="header-title">30 Days Overview</span>
+  </div>
+  <div class="header-block hb-black"></div>
+  <div class="header-block hb-yellow"></div>
+  <div class="header-block hb-teal"></div>
+</div>
+
+<!-- 切换按钮 -->
+<div class="btn-area">
+  <button class="btn all active" onclick="toggleAll()">ALL</button>
+  <button class="btn active" data-key="t"   onclick="toggle(this,'t')">时长 min</button>
+  <button class="btn active" data-key="n"   onclick="toggle(this,'n')">练习次数</button>
+  <button class="btn active" data-key="ex"  onclick="toggle(this,'ex')">考核次数</button>
+  <button class="btn active" data-key="x"   onclick="toggle(this,'x')">听力次数</button>
+  <button class="btn active" data-key="re"  onclick="toggle(this,'re')">复习次数</button>
+  <button class="btn active" data-key="er"  onclick="toggle(this,'er')">复习错误</button>
+  <button class="btn active" data-key="new" onclick="toggle(this,'new')">新学单词</button>
+</div>
+
+<!-- 图表 -->
+<div class="chart-wrap">
+  <canvas id="chart"></canvas>
+</div>
+
+<!-- 底部装饰 -->
+<div class="footer">
+  <div class="fb1"></div>
+  <div class="fb2"></div>
+  <div class="fb3"></div>
+  <div class="fb4"></div>
+</div>
+
+<script>
+const params   = new URLSearchParams(window.location.search);
+const labels   = JSON.parse(decodeURIComponent(params.get('days') || '[]'));
+const allData  = JSON.parse(decodeURIComponent(params.get('data') || '{}'));
+
+const METRICS = [
+  { key:'t',   label:'学习时长（分）', color:'#e63946', fill:true  },
+  { key:'n',   label:'练习词卡次数',   color:'#1a1a2e', fill:false },
+  { key:'ex',  label:'考核词卡次数',   color:'#6c63ff', fill:false },
+  { key:'x',   label:'听力次数',       color:'#2a9d8f', fill:false },
+  { key:'re',  label:'复习次数',       color:'#f4a261', fill:false },
+  { key:'er',  label:'复习错误次数',   color:'#e76f51', fill:false },
+  { key:'new', label:'新学单词数',     color:'#457b9d', fill:false },
+];
+
+const datasets = METRICS.map(m => ({
+  label: m.label,
+  data: labels.map(l => (allData[l] && allData[l][m.key] !== undefined)
+        ? allData[l][m.key] : 0),
+  borderColor: m.color,
+  backgroundColor: m.fill ? m.color + '18' : 'transparent',
+  fill: m.fill,
+  tension: 0.35,
+  borderWidth: 2,
+  pointRadius: 2.5,
+  pointHoverRadius: 5,
+  pointBackgroundColor: m.color,
+}));
+
+const keyMap = {};
+METRICS.forEach((m, i) => keyMap[m.key] = i);
+
+const ctx   = document.getElementById('chart').getContext('2d');
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: { labels, datasets },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode:'index', intersect:false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a1a2e',
+        titleFont: { family:'Microsoft YaHei', size:11 },
+        bodyFont:  { family:'Microsoft YaHei', size:11 },
+        padding: 12,
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}：${ctx.parsed.y}`,
+          afterLabel: ctx => {
+            const desc = {
+              '学习时长（分）': '程序运行的分钟数',
+              '练习词卡次数':   '所有模式的答题卡片总数',
+              '考核词卡次数':   '混合模式+章节考核的卡片数',
+              '听力次数':       '点读/词卡播放/循环播放次数',
+              '复习次数':       '每日复习答对次数（待开发）',
+              '复习错误次数':   '每日复习答错次数（待开发）',
+              '新学单词数':     '当天首次进入词库的单词数',
+            };
+            return '  ' + (desc[ctx.dataset.label] || '');
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color:'#f5f5f5', lineWidth: 1 },
+        ticks: {
+          font: { family:'Consolas', size:10 },
+          color: '#333',
+          maxTicksLimit: 10,
+          maxRotation: 0,
+        }
+      },
+      y: {
+        grid: { color:'#f5f5f5', lineWidth: 1 },
+        ticks: { font:{ family:'Consolas', size:10 }, color:'#333' },
+        beginAtZero: true,
+      }
+    }
+  }
+});
+
+let allOn = true;
+
+function toggle(btn, key) {
+  document.querySelector('.btn.all').classList.remove('active');
+  allOn = false;
+  const ds = chart.data.datasets[keyMap[key]];
+  ds.hidden = !ds.hidden;
+  btn.classList.toggle('active', !ds.hidden);
+  chart.update();
+}
+
+function toggleAll() {
+  allOn = !allOn;
+  chart.data.datasets.forEach(ds => ds.hidden = !allOn);
+  document.querySelectorAll('.btn[data-key]').forEach(
+    b => b.classList.toggle('active', allOn));
+  document.querySelector('.btn.all').classList.toggle('active', allOn);
+  chart.update();
+}
+</script>
+</body>
+</html>
