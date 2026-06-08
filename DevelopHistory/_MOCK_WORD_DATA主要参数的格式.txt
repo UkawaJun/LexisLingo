@@ -1,0 +1,8 @@
+Session_Word (9 个):
+['the', 'a', 'an', 'banana', 'apple', 'pear', 'yellow', 'red', 'green']
+
+Word_Level (37 个):
+[('the', True), ('a', True), ('an', True), ('banana', True), ('apple', True), ('pear', True), ('yellow', True), ('red', True), ('green', True), ('the', False), ('a', False), ('an', False), ('this', False), ('is', False), ('a', False), ('banana', False), ('that', False), ('is', False), ('an', False), ('apple', False), ('and', False), ('these', False), ('are', False), ('pears', False), ('the', False), ('banana', False), ('is', False), ('yellow', False), ('the', False), ('apple', False), ('is', False), ('red', False), ('and', False), ('the', False), ('pears', False), ('are', False), ('green', False)]
+
+_MOCK_WORD_DATA (9 个):
+{'the': {'trans': '这个，那个（指上文提到的人或物）', 'sentence': 'This is a banana, that is an apple and these are pears.', 'sentence_trans': '', 'type': 'art.', 'phon': '|ðə|'}, 'a': {'trans': '一个（用于辅音音素开头的单数名词前）', 'sentence': 'This is a banana, that is an apple and these are pears.', 'sentence_trans': '', 'type': 'art.', 'phon': '|ə|'}, 'an': {'trans': '一个（用于元音音素开头的单数名词前）', 'sentence': 'This is a banana, that is an apple and these are pears.', 'sentence_trans': '', 'type': 'art.', 'phon': '|ən|'}, 'banana': {'trans': '香蕉', 'sentence': 'This is a banana, that is an apple and these are pears.', 'sentence_trans': '', 'type': 'n.', 'phon': '|bə+nænə|'}, 'apple': {'trans': ' 苹果', 'sentence': 'This is a banana, that is an apple and these are pears.', 'sentence_trans': '', 'type': 'n.', 'phon': '|+æpəl|'}}
