@@ -18,7 +18,6 @@
     overflow: hidden;
   }
 
-  /* 包豪斯风格顶部色块 */
   .header {
     display: flex;
     align-items: stretch;
@@ -45,18 +44,18 @@
     text-transform: uppercase;
   }
 
-  /* 按钮区 */
   .btn-area {
-    padding: 12px 20px 8px;
+    padding: 10px 20px 8px;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 5px;
     flex-shrink: 0;
     border-bottom: 1px solid #f0f0f0;
+    align-items: center;
   }
 
   .btn {
-    padding: 4px 14px;
+    padding: 4px 12px;
     border: 1.5px solid #ddd;
     border-radius: 2px;
     background: #fff;
@@ -69,27 +68,35 @@
   }
 
   .btn:hover { border-color: #999; color: #333; }
-
   .btn.active { color: #fff; border-color: transparent; }
+
+  /* 各按钮激活色 */
   .btn[data-key="t"].active    { background: #e63946; }
+  .btn[data-key="x"].active    { background: #2a9d8f; }
   .btn[data-key="n"].active    { background: #1a1a2e; }
   .btn[data-key="ex"].active   { background: #6c63ff; }
-  .btn[data-key="x"].active    { background: #2a9d8f; }
+  .btn[data-key="ee"].active   { background: #a29bfe; }
   .btn[data-key="re"].active   { background: #f4a261; }
   .btn[data-key="er"].active   { background: #e76f51; }
   .btn[data-key="new"].active  { background: #457b9d; }
   .btn.all.active              { background: #333; }
 
-  /* 图表区 */
+  /* 分隔符 */
+  .sep {
+    width: 1px;
+    height: 20px;
+    background: #e0e0e0;
+    margin: 0 4px;
+  }
+
   .chart-wrap {
     flex: 1;
-    padding: 16px 20px 12px;
+    padding: 14px 20px 10px;
     min-height: 0;
   }
 
   canvas { width: 100% !important; height: 100% !important; }
 
-  /* 底部装饰条 */
   .footer {
     height: 6px;
     display: flex;
@@ -103,7 +110,6 @@
 </head>
 <body>
 
-<!-- 包豪斯顶部色块 -->
 <div class="header">
   <div class="header-block hb-red">
     <span class="header-title">30 Days Overview</span>
@@ -113,24 +119,54 @@
   <div class="header-block hb-teal"></div>
 </div>
 
-<!-- 切换按钮 -->
 <div class="btn-area">
-  <button class="btn all active" onclick="toggleAll()">ALL</button>
-  <button class="btn active" data-key="t"   onclick="toggle(this,'t')">时长 min</button>
-  <button class="btn active" data-key="n"   onclick="toggle(this,'n')">练习次数</button>
-  <button class="btn active" data-key="ex"  onclick="toggle(this,'ex')">考核次数</button>
-  <button class="btn active" data-key="x"   onclick="toggle(this,'x')">听力次数</button>
-  <button class="btn active" data-key="re"  onclick="toggle(this,'re')">复习次数</button>
-  <button class="btn active" data-key="er"  onclick="toggle(this,'er')">复习错误</button>
-  <button class="btn active" data-key="new" onclick="toggle(this,'new')">新学单词</button>
+  <button class="btn all active" onclick="toggleAll()" title="显示/隐藏全部曲线">ALL</button>
+
+  <div class="sep"></div>
+
+  <button class="btn active" data-key="t"
+    onclick="toggle(this,'t')"
+    title="每天使用程序的总时长（分钟），程序退出时统计写入">时长 min</button>
+
+  <button class="btn active" data-key="x"
+    onclick="toggle(this,'x')"
+    title="当天点击播放音频的总次数，包含词卡播放、循环播放、点读模式、句子合成">听力次数</button>
+
+  <button class="btn active" data-key="n"
+    onclick="toggle(this,'n')"
+    title="当天所有练习模式（含混合模式）词卡的总做题次数，不区分对错">练习次数</button>
+
+  <div class="sep"></div>
+
+  <button class="btn active" data-key="ex"
+    onclick="toggle(this,'ex')"
+    title="单元考核所做次数（混合模式 + 章节考核），每道题计1次">考核次数</button>
+
+  <button class="btn active" data-key="ee"
+    onclick="toggle(this,'ee')"
+    title="单元考核中答错的次数，与考核次数(ex)对应">考核错误</button>
+
+  <div class="sep"></div>
+
+  <button class="btn active" data-key="re"
+    onclick="toggle(this,'re')"
+    title="记忆曲线（艾宾浩斯）复习所做次数（功能开发中，暂无数据）">复习次数</button>
+
+  <button class="btn active" data-key="er"
+    onclick="toggle(this,'er')"
+    title="记忆曲线（艾宾浩斯）复习中答错的次数（功能开发中，暂无数据）">复习错误</button>
+
+  <div class="sep"></div>
+
+  <button class="btn active" data-key="new"
+    onclick="toggle(this,'new')"
+    title="当天首次进入个人词库的新单词数量（按FirstSeenAt时间戳统计）">新学单词</button>
 </div>
 
-<!-- 图表 -->
 <div class="chart-wrap">
   <canvas id="chart"></canvas>
 </div>
 
-<!-- 底部装饰 -->
 <div class="footer">
   <div class="fb1"></div>
   <div class="fb2"></div>
@@ -144,13 +180,14 @@ const labels   = JSON.parse(decodeURIComponent(params.get('days') || '[]'));
 const allData  = JSON.parse(decodeURIComponent(params.get('data') || '{}'));
 
 const METRICS = [
-  { key:'t',   label:'学习时长（分）', color:'#e63946', fill:true  },
-  { key:'n',   label:'练习词卡次数',   color:'#1a1a2e', fill:false },
-  { key:'ex',  label:'考核词卡次数',   color:'#6c63ff', fill:false },
-  { key:'x',   label:'听力次数',       color:'#2a9d8f', fill:false },
-  { key:'re',  label:'复习次数',       color:'#f4a261', fill:false },
-  { key:'er',  label:'复习错误次数',   color:'#e76f51', fill:false },
-  { key:'new', label:'新学单词数',     color:'#457b9d', fill:false },
+  { key:'t',   label:'学习时长（分）',  color:'#e63946', fill:true  },
+  { key:'x',   label:'听力次数',        color:'#2a9d8f', fill:false },
+  { key:'n',   label:'练习词卡次数',    color:'#1a1a2e', fill:false },
+  { key:'ex',  label:'考核次数',        color:'#6c63ff', fill:false },
+  { key:'ee',  label:'考核错误次数',    color:'#a29bfe', fill:false },
+  { key:'re',  label:'复习次数',        color:'#f4a261', fill:false },
+  { key:'er',  label:'复习错误次数',    color:'#e76f51', fill:false },
+  { key:'new', label:'新学单词数',      color:'#457b9d', fill:false },
 ];
 
 const datasets = METRICS.map(m => ({
@@ -184,21 +221,9 @@ const chart = new Chart(ctx, {
         backgroundColor: '#1a1a2e',
         titleFont: { family:'Microsoft YaHei', size:11 },
         bodyFont:  { family:'Microsoft YaHei', size:11 },
-        padding: 12,
+        padding: 10,
         callbacks: {
-          label: ctx => ` ${ctx.dataset.label}：${ctx.parsed.y}`,
-          afterLabel: ctx => {
-            const desc = {
-              '学习时长（分）': '程序运行的分钟数',
-              '练习词卡次数':   '所有模式的答题卡片总数',
-              '考核词卡次数':   '混合模式+章节考核的卡片数',
-              '听力次数':       '点读/词卡播放/循环播放次数',
-              '复习次数':       '每日复习答对次数（待开发）',
-              '复习错误次数':   '每日复习答错次数（待开发）',
-              '新学单词数':     '当天首次进入词库的单词数',
-            };
-            return '  ' + (desc[ctx.dataset.label] || '');
-          }
+          label: ctx => ` ${ctx.dataset.label}：${ctx.parsed.y}`
         }
       }
     },
@@ -240,6 +265,8 @@ function toggleAll() {
   document.querySelector('.btn.all').classList.toggle('active', allOn);
   chart.update();
 }
+
+document.querySelectorAll('.btn[data-key]').forEach(b => b.classList.add('active'));
 </script>
 </body>
 </html>
