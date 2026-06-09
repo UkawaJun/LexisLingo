@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Debug30Days.py  —  LexisLingo 学习数据可视化（PyQt5版）
 # ============================================================
 import ctypes
@@ -12,11 +12,11 @@ import os, sys, json, sqlite3
 from datetime import datetime, timedelta
 from urllib.parse import quote
 
-from PyQt5.QtCore    import Qt, QUrl, QUrlQuery
+from PyQt5.QtCore    import Qt, QUrl, QUrlQuery, QTimer
 from PyQt5.QtGui     import QFont
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                               QHBoxLayout, QLabel, QComboBox, QPushButton,
-                              QFrame, QSplitter, QSizePolicy, QScrollArea)
+                              QFrame, QSplitter, QSizePolicy)
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 
 QApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
@@ -111,7 +111,7 @@ def _count_stats(db_path, key):
 class StatCard(QFrame):
     def __init__(self, eng_label, chn_label, color, parent=None):
         super().__init__(parent)
-        self.setFixedHeight(90)
+        self.setFixedHeight(100)
         self.setStyleSheet(f"""
             QFrame {{
                 background: #ffffff;
@@ -120,8 +120,8 @@ class StatCard(QFrame):
             }}
         """)
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(16, 10, 16, 10)
-        lay.setSpacing(3)
+        lay.setContentsMargins(16, 8, 16, 8)
+        lay.setSpacing(1)
 
         lbl_eng = QLabel(eng_label)
         lbl_eng.setFont(QFont("Consolas", 9, QFont.Bold))
@@ -177,11 +177,40 @@ class Debug30Days(QMainWindow):
         super().__init__()
         self.setWindowTitle("LexisLingo · 学习数据可视化")
         self.resize(1200, 760)
-        self._udict = {}
-        self._paths = {}
-        self._info_rows = []
+        self._udict          = {}
+        self._paths          = {}
+        self._course_collapsed = False
+        self._flame_frames   = ["🔥", "🔆", "🔥", "✨"]
+        self._flame_idx      = 0
+        self._streak         = 0
         self._build_ui()
 
+        # 实时时钟定时器
+        self._clock_timer = QTimer(self)
+        self._clock_timer.setInterval(1000)
+        self._clock_timer.timeout.connect(self._update_clock)
+        self._clock_timer.start()
+        self._update_clock()
+
+        # 火焰动画定时器
+        self._flame_timer = QTimer(self)
+        self._flame_timer.setInterval(400)
+        self._flame_timer.timeout.connect(self._update_flame)
+        self._flame_timer.start()
+
+    # ── 时钟 ─────────────────────────────────────────────
+    def _update_clock(self):
+        now = datetime.now()
+        self._lbl_clock.setText(now.strftime("%H:%M:%S"))
+        self._lbl_date.setText(now.strftime("%Y年%m月%d日"))
+
+    def _update_flame(self):
+        if self._streak > 0:
+            self._flame_idx = (self._flame_idx + 1) % len(self._flame_frames)
+            flame = self._flame_frames[self._flame_idx]
+            self._lbl_streak.setText(f"{flame}  {self._streak} 天")
+
+    # ── UI ───────────────────────────────────────────────
     def _build_ui(self):
         central = QWidget()
         central.setStyleSheet("background:#f0f2f5;")
@@ -189,7 +218,7 @@ class Debug30Days(QMainWindow):
         root_lay.setContentsMargins(0, 0, 0, 0)
         root_lay.setSpacing(0)
 
-        # ── 顶栏 ──────────────────────────────────────────
+        # 顶栏
         top = QWidget()
         top.setFixedHeight(56)
         top.setStyleSheet("background:#1a1a2e;")
@@ -248,11 +277,11 @@ class Debug30Days(QMainWindow):
 
         root_lay.addWidget(top)
 
-        # ── 主体分割 ──────────────────────────────────────
+        # 主体分割
         splitter = QSplitter(Qt.Horizontal)
         splitter.setStyleSheet("QSplitter::handle { background:#e0e0e0; width:1px; }")
 
-        # 左侧面板
+        # ── 左侧面板 ──────────────────────────────────────
         left = QWidget()
         left.setFixedWidth(240)
         left.setStyleSheet("background:#f0f2f5;")
@@ -286,32 +315,117 @@ class Debug30Days(QMainWindow):
             wl.addWidget(card)
             left_lay.addWidget(wrap)
 
-        # 分隔线
         sep = QFrame()
         sep.setFixedHeight(1)
         sep.setStyleSheet("background:#dddddd;")
         left_lay.addWidget(sep)
-        left_lay.addSpacing(12)
+        left_lay.addSpacing(8)
 
-        # 用户信息区（用InfoRow打点）
+        # 用户基本信息区
         self._info_area = QWidget()
         self._info_area.setStyleSheet("background:transparent;")
         self._info_lay = QVBoxLayout(self._info_area)
         self._info_lay.setContentsMargins(0, 0, 0, 0)
         self._info_lay.setSpacing(2)
         left_lay.addWidget(self._info_area)
+
+        left_lay.addSpacing(4)
+
+        # 课程折叠按钮
+        self._course_toggle_btn = QPushButton("▼  课程进度")
+        self._course_toggle_btn.setFont(QFont("Microsoft YaHei", 10))
+        self._course_toggle_btn.setFixedHeight(28)
+        self._course_toggle_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent; color: #888888;
+                border: none; text-align: left;
+                padding-left: 16px;
+            }
+            QPushButton:hover { color: #333333; }
+        """)
+        self._course_toggle_btn.clicked.connect(self._toggle_course_rows)
+        left_lay.addWidget(self._course_toggle_btn)
+
+        # 课程信息区（可折叠）
+        self._course_rows_area = QWidget()
+        self._course_rows_area.setStyleSheet("background:transparent;")
+        self._course_rows_lay = QVBoxLayout(self._course_rows_area)
+        self._course_rows_lay.setContentsMargins(0, 0, 0, 0)
+        self._course_rows_lay.setSpacing(2)
+        left_lay.addWidget(self._course_rows_area)
+
+        sep2 = QFrame()
+        sep2.setFixedHeight(1)
+        sep2.setStyleSheet("background:#dddddd;")
+        left_lay.addWidget(sep2)
+        left_lay.addSpacing(10)
+
+        # 连续天数（火焰动态）
+        self._lbl_streak = QLabel("")
+        self._lbl_streak.setVisible(False)
+
+        self._lbl_streak.setFont(QFont("Microsoft YaHei", 18, QFont.Bold))
+        self._lbl_streak.setStyleSheet("color:#e63946; background:transparent;")
+        self._lbl_streak.setAlignment(Qt.AlignCenter)
+        left_lay.addWidget(self._lbl_streak)
+
+        self._lbl_streak_sub = QLabel("连续学习天数")
+        self._lbl_streak_sub.setFont(QFont("Microsoft YaHei", 10))
+        self._lbl_streak_sub.setStyleSheet("color:#aaaaaa; background:transparent;")
+        self._lbl_streak_sub.setAlignment(Qt.AlignCenter)
+        self._lbl_streak_sub.setVisible(False)
+        left_lay.addWidget(self._lbl_streak_sub)
+
+        left_lay.addSpacing(12)
+
+        sep3 = QFrame()
+        sep3.setFixedHeight(1)
+        sep3.setStyleSheet("background:#dddddd;")
+        left_lay.addWidget(sep3)
+        left_lay.addSpacing(10)
+
+        # 实时时钟
+        self._lbl_clock = QLabel("00:00:00")
+        self._lbl_clock.setFont(QFont("Consolas", 22, QFont.Bold))
+        self._lbl_clock.setStyleSheet("color:#1a1a2e; background:transparent;")
+        self._lbl_clock.setAlignment(Qt.AlignCenter)
+        left_lay.addWidget(self._lbl_clock)
+
+        self._lbl_date = QLabel("")
+        self._lbl_date.setFont(QFont("Microsoft YaHei", 10))
+        self._lbl_date.setStyleSheet("color:#aaaaaa; background:transparent;")
+        self._lbl_date.setAlignment(Qt.AlignCenter)
+        left_lay.addWidget(self._lbl_date)
+
+        
         left_lay.addStretch()
+        # 截图按钮
+        btn_shot = QPushButton("📷  保存截图")
+        btn_shot.setFont(QFont("Microsoft YaHei", 10))
+        btn_shot.setFixedHeight(36)
+        btn_shot.setStyleSheet("""
+            QPushButton {
+                background: #1a1a2e; color: #ffffff;
+                border: none; border-radius: 4px;
+                margin: 0 16px;
+            }
+            QPushButton:hover { background: #2c2c4a; }
+        """)
+        btn_shot.clicked.connect(self._save_screenshot)
+
+        
+        left_lay.addWidget(btn_shot)
+        left_lay.addSpacing(12)
 
         splitter.addWidget(left)
 
-        # 右侧图表区
+        # ── 右侧图表区 ────────────────────────────────────
         right = QWidget()
         right.setStyleSheet("background:#f0f2f5;")
         right_lay = QVBoxLayout(right)
         right_lay.setContentsMargins(20, 16, 20, 20)
         right_lay.setSpacing(10)
 
-        # 图表标题行
         hdr = QHBoxLayout()
         t1 = QLabel("30 DAYS OVERVIEW")
         t1.setFont(QFont("Consolas", 14, QFont.Bold))
@@ -325,9 +439,8 @@ class Debug30Days(QMainWindow):
         hdr.addStretch()
         right_lay.addLayout(hdr)
 
-        # WebEngineView 直接占满右侧剩余空间
         self._web = QWebEngineView()
-        self._web.setStyleSheet("border:none; border-radius:0px;")
+        self._web.setStyleSheet("border:none;")
         self._web.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         QWebEngineSettings.globalSettings().setAttribute(
             QWebEngineSettings.LocalContentCanAccessFileUrls, True)
@@ -349,6 +462,14 @@ class Debug30Days(QMainWindow):
         self.setCentralWidget(central)
         self._refresh_courses()
 
+    # ── 课程折叠 ──────────────────────────────────────────
+    def _toggle_course_rows(self):
+        self._course_collapsed = not self._course_collapsed
+        self._course_rows_area.setVisible(not self._course_collapsed)
+        self._course_toggle_btn.setText(
+            "▶  课程进度" if self._course_collapsed else "▼  课程进度")
+
+    # ── 目录扫描 ──────────────────────────────────────────
     def _refresh_courses(self):
         data_root = "Data"
         if os.path.exists(data_root):
@@ -365,15 +486,47 @@ class Debug30Days(QMainWindow):
                      if f.endswith(".json") and "_ld" not in f]
             self._user_cb.addItems(users)
 
+    # ── 信息行 ────────────────────────────────────────────
     def _set_info_rows(self, rows):
-        """清空并重建用户信息行"""
         for i in reversed(range(self._info_lay.count())):
             w = self._info_lay.itemAt(i).widget()
             if w: w.deleteLater()
+        for i in reversed(range(self._course_rows_lay.count())):
+            w = self._course_rows_lay.itemAt(i).widget()
+            if w: w.deleteLater()
+
+        course_keys = ("课程", "当前")
         for label, value in rows:
             row = InfoRow(label, value)
-            self._info_lay.addWidget(row)
+            if label in course_keys:
+                self._course_rows_lay.addWidget(row)
+            else:
+                self._info_lay.addWidget(row)
 
+    # ── 连续天数 ──────────────────────────────────────────
+    def _calc_streak(self, day_data):
+        sorted_keys = sorted(day_data.keys(), reverse=True)
+        streak = 0
+        for k in sorted_keys:
+            if day_data[k].get("t", 0) > 1:
+                streak += 1
+            else:
+                break
+        return streak
+
+    # ── 截图 ──────────────────────────────────────────────
+    def _save_screenshot(self):
+        report_dir = os.path.abspath("Report")
+        os.makedirs(report_dir, exist_ok=True)
+        now      = datetime.now().strftime("%Y%m%d_%H%M%S")
+        user     = self._user_cb.currentText() or "unknown"
+        filename = f"{user}_{now}_学习数据.png"
+        path     = os.path.join(report_dir, filename)
+        screen   = self.grab()
+        screen.save(path)
+        self._status.setText(f"📷 截图已保存：{filename}")
+
+    # ── 加载 ──────────────────────────────────────────────
     def _load(self):
         course = self._course_cb.currentText()
         user   = self._user_cb.currentText()
@@ -391,14 +544,12 @@ class Debug30Days(QMainWindow):
             self._status.setText(f"读取失败：{e}")
             return
 
-        # 统计数字
         total, mastered, examed = _count_stats(
             self._paths["Use2"], KEY_LABEL["UserData"])
         self._card_total.set_value(total)
         self._card_mastered.set_value(mastered)
         self._card_examed.set_value(examed)
 
-        # 用户信息打点行
         nick    = self._udict.get("Nickname", user)
         reg     = self._udict.get("RegisterTime", 0)
         reg_str = datetime.fromtimestamp(int(reg)).strftime(
@@ -412,23 +563,37 @@ class Debug30Days(QMainWindow):
             ("当前", cur),
         ])
 
-        # 30天数据
         labels, day_data = _collect_30days(self._udict)
         _count_new_words(self._paths["Use2"], KEY_LABEL["UserData"], day_data)
 
-        self._status.setText(f"✅ {course} / {user}  词库 {total} 词")
+        self._streak = self._calc_streak(day_data)
+        self._lbl_streak.setText(f"🔥  {self._streak} 天")
+        self._lbl_streak.setVisible(True)
+        self._lbl_streak_sub.setVisible(True)
+        self._status.setText(
+            f"✅ {course} / {user}  词库 {total} 词  🔥 连续 {self._streak} 天")
+
         self._render_chart(labels, day_data)
 
+    # ── 渲染图表 ──────────────────────────────────────────
     def _render_chart(self, labels, day_data):
         if not os.path.exists(HTML_PATH):
             self._status.setText("❌ 找不到 show30DaysDate.html")
             return
 
+        # 裁掉左侧连续为零的天
+        fields      = ("t","x","n","ex","ee","re","er","new")
         sorted_keys = sorted(day_data.keys())
-        labels_out  = [day_data[k]["label"] for k in sorted_keys]
-        data_out    = {day_data[k]["label"]: {
-            f: day_data[k][f]
-            for f in ("t","x","n","ex","ee","re","er","new")
+        first_nz    = 0
+        for i, k in enumerate(sorted_keys):
+            if any(day_data[k].get(f, 0) > 0 for f in fields):
+                first_nz = i
+                break
+        sorted_keys = sorted_keys[first_nz:]
+
+        labels_out = [day_data[k]["label"] for k in sorted_keys]
+        data_out   = {day_data[k]["label"]: {
+            f: day_data[k][f] for f in fields
         } for k in sorted_keys}
 
         days_json = quote(json.dumps(labels_out, ensure_ascii=False))
