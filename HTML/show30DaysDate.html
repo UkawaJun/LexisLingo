@@ -31,10 +31,10 @@
     padding: 0 20px;
   }
 
-  .hb-red   { background: #e63946; flex: 3; }
-  .hb-black { background: #1a1a2e; flex: 1; }
-  .hb-yellow{ background: #f4a261; flex: 1; }
-  .hb-teal  { background: #2a9d8f; flex: 2; }
+  .hb-red    { background: #e63946; flex: 3; }
+  .hb-black  { background: #1a1a2e; flex: 1; }
+  .hb-yellow { background: #f4a261; flex: 1; }
+  .hb-teal   { background: #2a9d8f; flex: 2; }
 
   .header-title {
     color: #fff;
@@ -48,14 +48,14 @@
     padding: 10px 20px 8px;
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 6px;
     flex-shrink: 0;
     border-bottom: 1px solid #f0f0f0;
     align-items: center;
   }
 
   .btn {
-    padding: 4px 12px;
+    padding: 4px 14px;
     border: 1.5px solid #ddd;
     border-radius: 2px;
     background: #fff;
@@ -70,21 +70,20 @@
   .btn:hover { border-color: #999; color: #333; }
   .btn.active { color: #fff; border-color: transparent; }
 
-  /* 各按钮激活色 */
-  .btn[data-key="t"].active    { background: #e63946; }
-  .btn[data-key="x"].active    { background: #2a9d8f; }
-  .btn[data-key="n"].active    { background: #1a1a2e; }
-  .btn[data-key="ex"].active   { background: #6c63ff; }
-  .btn[data-key="ee"].active   { background: #a29bfe; }
-  .btn[data-key="re"].active   { background: #f4a261; }
-  .btn[data-key="er"].active   { background: #e76f51; }
-  .btn[data-key="new"].active  { background: #457b9d; }
-  .btn.all.active              { background: #333; }
+  .btn[data-key="t"].active   { background: #e63946; }
+  .btn[data-key="x"].active   { background: #2a9d8f; }
+  .btn[data-key="n"].active   { background: #1a1a2e; }
+  .btn[data-key="ex"].active  { background: #6c63ff; }
+  .btn[data-key="ee"].active  { background: #a29bfe; }
+  .btn[data-key="re"].active  { background: #f4a261; }
+  .btn[data-key="er"].active  { background: #e76f51; }
+  .btn[data-key="new"].active { background: #457b9d; }
+  .btn.all.active             { background: #333; }
 
-  /* 分隔符 */
-  .sep {
+  /* 分组分隔线 */
+  .divider {
     width: 1px;
-    height: 20px;
+    height: 22px;
     background: #e0e0e0;
     margin: 0 4px;
   }
@@ -98,7 +97,7 @@
   canvas { width: 100% !important; height: 100% !important; }
 
   .footer {
-    height: 6px;
+    height: 5px;
     display: flex;
     flex-shrink: 0;
   }
@@ -122,11 +121,11 @@
 <div class="btn-area">
   <button class="btn all active" onclick="toggleAll()" title="显示/隐藏全部曲线">ALL</button>
 
-  <div class="sep"></div>
+  <div class="divider"></div>
 
   <button class="btn active" data-key="t"
     onclick="toggle(this,'t')"
-    title="每天使用程序的总时长（分钟），程序退出时统计写入">时长 min</button>
+    title="每天使用程序的总时长（分钟），程序退出时统计">时长 min</button>
 
   <button class="btn active" data-key="x"
     onclick="toggle(this,'x')"
@@ -134,33 +133,35 @@
 
   <button class="btn active" data-key="n"
     onclick="toggle(this,'n')"
-    title="当天所有练习模式（含混合模式）词卡的总做题次数，不区分对错">练习次数</button>
-
-  <div class="sep"></div>
-
-  <button class="btn active" data-key="ex"
-    onclick="toggle(this,'ex')"
-    title="单元考核所做次数（混合模式 + 章节考核），每道题计1次">考核次数</button>
-
-  <button class="btn active" data-key="ee"
-    onclick="toggle(this,'ee')"
-    title="单元考核中答错的次数，与考核次数(ex)对应">考核错误</button>
-
-  <div class="sep"></div>
-
-  <button class="btn active" data-key="re"
-    onclick="toggle(this,'re')"
-    title="记忆曲线（艾宾浩斯）复习所做次数（功能开发中，暂无数据）">复习次数</button>
-
-  <button class="btn active" data-key="er"
-    onclick="toggle(this,'er')"
-    title="记忆曲线（艾宾浩斯）复习中答错的次数（功能开发中，暂无数据）">复习错误</button>
-
-  <div class="sep"></div>
+    title="当天所有练习模式下做题的总次数，不区分对错">练习次数</button>
 
   <button class="btn active" data-key="new"
     onclick="toggle(this,'new')"
-    title="当天首次进入个人词库的新单词数量（按FirstSeenAt时间戳统计）">新学单词</button>
+    title="当天首次进入个人词库的新单词数量（按FirstSeenAt统计）">新学单词</button>
+
+  <div class="divider"></div>
+
+  <button class="btn active" data-key="ex"
+    onclick="toggle(this,'ex')"
+    title="当天单元考核所做题次数（章节考核）">考核次数</button>
+
+  <button class="btn active" data-key="ee"
+    onclick="toggle(this,'ee')"
+    title="当天单元考核中答错的次数">考核错误</button>
+
+  <div class="divider"></div>
+
+  <button class="btn active" data-key="re"
+    onclick="toggle(this,'re')"
+    title="艾宾浩斯记忆曲线复习次数（功能开发中，暂无数据）">复习次数</button>
+
+  <button class="btn active" data-key="er"
+    onclick="toggle(this,'er')"
+    title="艾宾浩斯记忆曲线复习错误次数（功能开发中，暂无数据）">复习错误</button>
+
+  <div class="divider"></div>
+
+  
 </div>
 
 <div class="chart-wrap">
@@ -175,19 +176,19 @@
 </div>
 
 <script>
-const params   = new URLSearchParams(window.location.search);
-const labels   = JSON.parse(decodeURIComponent(params.get('days') || '[]'));
-const allData  = JSON.parse(decodeURIComponent(params.get('data') || '{}'));
+const params  = new URLSearchParams(window.location.search);
+const labels  = JSON.parse(decodeURIComponent(params.get('days') || '[]'));
+const allData = JSON.parse(decodeURIComponent(params.get('data') || '{}'));
 
 const METRICS = [
-  { key:'t',   label:'学习时长（分）',  color:'#e63946', fill:true  },
-  { key:'x',   label:'听力次数',        color:'#2a9d8f', fill:false },
-  { key:'n',   label:'练习词卡次数',    color:'#1a1a2e', fill:false },
-  { key:'ex',  label:'考核次数',        color:'#6c63ff', fill:false },
-  { key:'ee',  label:'考核错误次数',    color:'#a29bfe', fill:false },
-  { key:'re',  label:'复习次数',        color:'#f4a261', fill:false },
-  { key:'er',  label:'复习错误次数',    color:'#e76f51', fill:false },
-  { key:'new', label:'新学单词数',      color:'#457b9d', fill:false },
+  { key:'t',   label:'学习时长（分）', color:'#e63946', fill:true  },
+  { key:'x',   label:'听力次数',       color:'#2a9d8f', fill:false },
+  { key:'n',   label:'练习次数',       color:'#1a1a2e', fill:false },
+  { key:'ex',  label:'考核次数',       color:'#6c63ff', fill:false },
+  { key:'ee',  label:'考核错误次数',   color:'#a29bfe', fill:false },
+  { key:'re',  label:'复习次数',       color:'#f4a261', fill:false },
+  { key:'er',  label:'复习错误次数',   color:'#e76f51', fill:false },
+  { key:'new', label:'新学单词数',     color:'#457b9d', fill:false },
 ];
 
 const datasets = METRICS.map(m => ({
@@ -229,16 +230,12 @@ const chart = new Chart(ctx, {
     },
     scales: {
       x: {
-        grid: { color:'#f5f5f5', lineWidth: 1 },
-        ticks: {
-          font: { family:'Consolas', size:10 },
-          color: '#333',
-          maxTicksLimit: 10,
-          maxRotation: 0,
-        }
+        grid: { color:'#f5f5f5', lineWidth:1 },
+        ticks: { font:{ family:'Consolas', size:10 }, color:'#333',
+                 maxTicksLimit:10, maxRotation:0 }
       },
       y: {
-        grid: { color:'#f5f5f5', lineWidth: 1 },
+        grid: { color:'#f5f5f5', lineWidth:1 },
         ticks: { font:{ family:'Consolas', size:10 }, color:'#333' },
         beginAtZero: true,
       }
